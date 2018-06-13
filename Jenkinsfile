@@ -19,7 +19,7 @@ node {
         //現在のGreenサーバの情報(AWS関係)を取得
         dir("${tf_path}"){
             option = "\$3"
-            id = sh returnStdout: ture, script :"${terraform} state show aws_lb_target_group_attachment.green_attach | grep target_id | awk '{print ${option}}'"
+            id = sh returnStdout: true, script :"${terraform} state show aws_lb_target_group_attachment.green_attach | grep target_id | awk '{print ${option}}'"
             try{    
                 result = sh returnStdout: true, script :"${terraform} state show aws_instance.2anet_server1 | grep ${id}"
                 cgreen_name = "2anet_server1"    
@@ -34,7 +34,7 @@ node {
     stage('Destroy of the current green server'){
         //現在のGreenサーバを破棄
         dir("${tf_path}"){
-            sh "${terraform} destroy -auto-approve-target=aws_instance.${cgreen_name} ./stage1"
+            sh "${terraform} destroy -auto-approve -target=aws_instance.${cgreen_name} ./stage1"
         }
     }
 
