@@ -19,9 +19,9 @@ node {
         //現在のGreenサーバの情報(AWS関係)を取得
         dir("${tf_path}"){
             option = "\$3"
-            id = sh returnStdout: ture, script: "${terraform} state show aws_lb_target_group_attachment.green_attach | grep target_id | awk '{print ${option}}'"
+            id = sh returnStdout: ture, script :"${terraform} state show aws_lb_target_group_attachment.green_attach | grep target_id | awk '{print ${option}}'"
             try{    
-                result = sh returnStdout: true, script: "${terraform} state show aws_instance.2anet_server1 | grep ${id}"
+                result = sh returnStdout: true, script :"${terraform} state show aws_instance.2anet_server1 | grep ${id}"
                 cgreen_name = "2anet_server1"    
             }catch(exspection){
                 cgreen_name = "2anet_server2"
@@ -48,6 +48,10 @@ node {
 
     stage('Provisioning for new blue server'){
         //Ansibleを使用して新しいBlueサーバを設定する
+        dir("${tf_path}"){
+            option = "\$3"
+            ip = sh returnStdout: true, script: "${terraform} state show aws_instance.${cgreen_name} | egrep '^public_ip' | awk '{print ${option}}'"
+        }
     }
 
     stage('Execute test for new blue server'){
