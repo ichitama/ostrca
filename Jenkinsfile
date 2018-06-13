@@ -11,7 +11,7 @@ node {
     }
 
     stage('build & test'){
-        sh "Building code and test."
+        sh "Building code and test"
 
     }
 
@@ -19,13 +19,23 @@ node {
         //現在のGreenサーバの情報(AWS関係)を取得
         dir("${tf_path}"){
             id = sh returnStdout: ture, script: "${terraform} state showterraform state show aws_lb_target_group_attachement.green_attach | grep target_id | awk '{print ${option}}'"
-        }
+            
+            result = sh returnStdout: true,script: "${terraform} state show aws_instance.2anet_server1 | grep ${id}"
+
+            if(result == ""){
+                cgreen_name = "2anet_server2"
+            }else{
+                cgreen_name = "2anet_server1"
+            }
+
+            }
         sh "echo ${id}"
     
     }
 
     stage('Destroy of the current green server'){
         //現在のGreenサーバを破棄
+
     }
 
     stage('Create new blue server instance'){
