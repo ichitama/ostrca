@@ -19,9 +19,9 @@ node {
         //現在のGreenサーバの情報(AWS関係)を取得
         dir("${tf_path}"){
             option = "\$3"
-            id = sh returnStdout: ture, script: "${terraform} state show terraform state show aws_lb_target_group_attachement.green_attach | grep target_id | awk '{print ${option}}'"
+            id = sh returnStdout: ture, script: "${terraform} state show aws_lb_target_group_attachement.green_attach | grep target_id | awk '{print ${option}}'"
             try{    
-                result = sh returnStdout: true,script: "${terraform} state show aws_instance.2anet_server1 | grep ${id}"
+                result = sh returnStdout: true, script: "${terraform} state show aws_instance.2anet_server1 | grep ${id}"
                 cgreen_name = "2anet_server1"    
             }catch(exspection){
                 cgreen_name = "2anet_server2"
