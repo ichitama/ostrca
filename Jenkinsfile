@@ -19,7 +19,7 @@ node {
         //現在のGreenサーバの情報(AWS関係)を取得
         dir("${tf_path}"){
             option = "\$3"
-            id = sh returnStdout: true, script :"${terraform} state show aws_lb_target_group_attachment.green_attach | grep target_id | awk '{print ${option}}' | tr -d '\n'"
+            id = sh returnStdout: true, script :"${terraform} state show aws_lb_target_group_attachment.green_attach | grep target_id | awk '{print ${option}}'"
             try{    
                 result = sh returnStdout: true, script :"${terraform} state show aws_instance.2anet_server1 | grep ${id}"
                 cgreen_name = "2anet_server1"    
@@ -50,12 +50,13 @@ node {
         //Ansibleを使用して新しいBlueサーバを設定する
         dir("${tf_path}"){
             option = "\$3"
-            ip = sh returnStdout: true, script: "${terraform} state show aws_instance.${cgreen_name} | egrep '^public_ip' | awk '{print ${option}}'"
+            ip = sh returnStdout: true, script: "${terraform} state show aws_instance.${cgreen_name} | egrep '^public_ip' | awk '{print ${option}}' | tr -d '\n'"
         }
         sh "echo ${ip}"
         dir("${ansible_path}"){
             sh "echo '[blue_server]' > ./hosts"
             sh "echo ${ip} >> ./hosts"
+            sh "sleep 10"
             sh "ansible-playbook -i ./hosts --private-key=./2Anet.pem ./ostraca.yml"
         }
     }
